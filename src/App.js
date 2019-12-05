@@ -9,6 +9,7 @@ class App extends Component {
   state = {
     text: '',
     movies: [],
+    joke: '',
   };
 
   changeText = (event) => {
@@ -47,6 +48,29 @@ class App extends Component {
     this.setState({movies})
   };
 
+  async componentDidMount() {
+    const response = await fetch('https://api.chucknorris.io/jokes/random');
+
+    if(response.ok){
+      const post = await response.json();
+      console.log(post);
+      this.setState({joke: post.value})
+    }
+  }
+
+  newJoke = () => {
+    fetch('https://api.chucknorris.io/jokes/random').then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error('Something went wrong with network request');
+    }).then(post => {
+      this.setState({joke: post.value})
+    })
+  };
+
+
+
   render() {
     const movies = this.state.movies.map(movie => (<MovieTab
       key={movie.id}
@@ -61,6 +85,13 @@ class App extends Component {
           < AddMovieForm onChange={this.changeText} add={this.addMovie}/>
           <div>
             {movies}
+          </div>
+        </div>
+
+        <div className="JokeApp">
+          {this.state.joke}
+          <div style={{padding: '20px', textAlign: 'center'}}>
+            <button onClick={this.newJoke}>New Joke</button>
           </div>
         </div>
       </div>
